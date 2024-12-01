@@ -23,7 +23,7 @@ app.add_middleware(
 
 @app.get('/', summary="Home page")
 async def dashboard():
-    print("Backend intern task home page.")
+    return "Backend intern task home page."
 
 
 @app.post("/students", response_model=dict, status_code=201, summary="Create student")
