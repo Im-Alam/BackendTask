@@ -1,14 +1,9 @@
-from fastapi import HTTPException, Query, Path
+from fastapi import HTTPException
 from typing import Optional
-from bson import ObjectId
-from db.connect_db import client
+from db.connect_db import students_collection
 
 from db_model.student_model import StudentSchema
 
-students_db = client["students_db"]
-students_collection = students_db["students"]
-
-# global id_tracker = 
 
 # Utility function to convert ObjectId to string
 def student_serializer(student) -> dict:
@@ -18,13 +13,20 @@ def student_serializer(student) -> dict:
         "address": student["address"],
     }
 
+async def isValidId(id:str):
+    if len(id)==6 and id.isdigit():
+        return True
+    else:
+        return False
 
 
 async def create_student(student_data: dict) -> dict:
     try:
         result = await students_collection.insert_one(student_data)
-        return {"inserted_id": result.inserted_id}
+        if result.inserted_id:
+            return {"id": student_data['id']}
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail="Error in inserting operation")
 
 
@@ -44,10 +46,10 @@ async def list_students(country: Optional[str], age: Optional[int]) -> dict:
 
 
 async def fetch_student_by_id(id: str) -> dict:
-    if not ObjectId.is_valid(id):
-        raise HTTPException(status_code=400, detail="Invalid student ID")
+    if not isValidId(id):
+        raise HTTPException(status_code=400, detail="Invalid student ID, ID is 6 digit-numeric")
 
-    student = await students_collection.find_one({"_id": ObjectId(id)})
+    student = await students_collection.find_one({"id": id})
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
@@ -56,33 +58,34 @@ async def fetch_student_by_id(id: str) -> dict:
 
 
 async def update_student(id: str, student_update: StudentSchema) -> None:
-    if not ObjectId.is_valid(id):
-        raise HTTPException(status_code=400, detail="Invalid student ID")
+    if not isValidId(id):
+        raise HTTPException(status_code=400, detail="Invalid student ID, ID is 6 digit-numeric")
 
-    student = await students_collection.find_one({"_id": ObjectId(id)})
+    student = await students_collection.find_one({"id": id})
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
     updated_data = student_update.dict(exclude_unset=True, exclude_none=True)
     await students_collection.update_one(
-        {"_id": ObjectId(id)}, {"$set": updated_data}
+        {"id": id}, {"$set": updated_data}
     )
 
 
 
 async def delete_student(id: str) -> None:
-    if not ObjectId.is_valid(id):
-        raise HTTPException(status_code=400, detail="Invalid student ID")
+    if not isValidId(id):
+        raise HTTPException(status_code=400, detail="Invalid student ID, ID is 6 digit-numeric")
 
-    student = await students_collection.find_one({"_id": ObjectId(id)})
+    student = await students_collection.find_one({"id": id})
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    await students_collection.delete_one({"_id": ObjectId(id)})
+    await students_collection.delete_one({"id": id})
 
 
 if __name__ == "__main__":
     data = {
+            "id":"123456",
             "name": "John Doe",
             "age": 25,
             "address": {

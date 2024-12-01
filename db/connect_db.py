@@ -17,6 +17,7 @@ def connectDB():
         print(e)
 
 client = connectDB()
+students_collection = client['students_db']['students']
 
 if __name__ == "__main__":
     connectDB()

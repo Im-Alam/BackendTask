@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Query, Path
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 
+
 from db_model.student_model import StudentSchema, StudentResponse, StudentUpdate
 from controller.student_controller import (
     create_student,
@@ -11,15 +12,16 @@ from controller.student_controller import (
     delete_student,
 )
 
-
+from nanoid import generate
 
 app = FastAPI(version="1.0.0", title="Backend intern hiring task")
-
+from db.connect_db import students_collection
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins= ['*'],
 )
+
 
 @app.get('/', summary="Home page")
 async def dashboard():
@@ -30,14 +32,14 @@ async def dashboard():
 async def create_student_api(student: StudentSchema):
     # print(type(student))
     student_data = {
+        "id": generate(alphabet = '123456789', size=6),
         "name": student.name,
         "age": student.age,
         "address": student.address.dict(),
     }
     result = await create_student(student_data)
-        
 
-    return {"id": str(result["inserted_id"])}
+    return result
 
 
 @app.get("/students", response_model=dict, summary="List students")
@@ -68,4 +70,4 @@ async def delete_student_api(id: str = Path(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", reload=True, workers=1)
