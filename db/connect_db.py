@@ -1,13 +1,13 @@
 import os
 from dotenv import load_dotenv
-from pymongo.mongo_client import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 
 load_dotenv()
 
 def connectDB():
     uri = os.getenv('db_connection_str')
 
-    client = MongoClient(uri)
+    client = AsyncIOMotorClient(uri)
 
     try:
         client.admin.command('ping')
@@ -16,6 +16,7 @@ def connectDB():
     except Exception as e:
         print(e)
 
+client = connectDB()
 
 if __name__ == "__main__":
     connectDB()
