@@ -3,3 +3,4 @@ BackenEnv
 __pyache__
 *.pyc
 .env
+.vercel
