@@ -4,6 +4,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 load_dotenv()
 
+client = None
+
 def connectDB():
     uri = os.getenv('db_connection_str')
 

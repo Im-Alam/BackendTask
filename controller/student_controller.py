@@ -13,7 +13,7 @@ def student_serializer(student) -> dict:
         "address": student["address"],
     }
 
-async def isValidId(id:str):
+def isValidId(id:str):
     if len(id)==6 and id.isdigit():
         return True
     else:

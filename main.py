@@ -11,11 +11,9 @@ from controller.student_controller import (
     update_student,
     delete_student,
 )
-
 from nanoid import generate
 
 app = FastAPI(version="1.0.0", title="Backend intern hiring task")
-from db.connect_db import students_collection
 
 app.add_middleware(
     CORSMiddleware,
@@ -66,8 +64,3 @@ async def update_student_api(
 async def delete_student_api(id: str = Path(...)):
     await delete_student(id)
     return {}
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", reload=True, workers=1)
