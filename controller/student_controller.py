@@ -65,7 +65,7 @@ async def update_student(id: str, student_update: StudentSchema) -> None:
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    updated_data = student_update.dict(exclude_unset=True, exclude_none=True)
+    updated_data = student_update.model_dump(exclude_unset=True, exclude_none=True)
     await students_collection.update_one(
         {"id": id}, {"$set": updated_data}
     )

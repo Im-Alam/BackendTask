@@ -36,7 +36,7 @@ async def create_student_api(student: StudentSchema):
         "id": generate(alphabet = '123456789', size=6),
         "name": student.name,
         "age": student.age,
-        "address": student.address.dict(),
+        "address": student.address.model_dump(),
     }
     result = await create_student(student_data)
 
